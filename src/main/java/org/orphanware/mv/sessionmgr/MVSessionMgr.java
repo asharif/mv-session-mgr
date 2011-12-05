@@ -82,14 +82,14 @@ public class MVSessionMgr implements MVSessionMgrMBean {
         this.user = user;
     }
 
-     public int getPoolsize() {
+    public int getPoolsize() {
         return poolsize;
     }
 
     public void setPoolsize(int poolsize) {
         this.poolsize = poolsize;
     }
-    
+
     private MVSessionMgr() {
     }
 
@@ -113,7 +113,7 @@ public class MVSessionMgr implements MVSessionMgrMBean {
             NotCompliantMBeanException, MalformedObjectNameException {
 
         logger.debug("building new MVSessionMgr...");
-        
+
         this.connections = new ArrayList<MVConnection>(poolsize);
 
         reaper = new ConnectionReaper(this);
@@ -121,47 +121,50 @@ public class MVSessionMgr implements MVSessionMgrMBean {
 
         filler = new PoolFiller(this);
         filler.start();
-        
+
         mserver.registerMBean(this, new ObjectName("org.orphanware.mv.jdbc:type=index"));
     }
 
     public void reapConnections() {
 
-
-        logger.info(Thread.currentThread().getName() + " reaping mv connections (curr pool size " + this.connections.size() + "...");
-
-
-        Iterator it = this.connections.iterator();
+        synchronized (this.connections) {
+            
+            logger.info(Thread.currentThread().getName() + " reaping mv connections (curr pool size " + this.connections.size() + "...");
 
 
-        while (it.hasNext()) {
-
-            MVConnection tmpConn = (MVConnection) it.next();
-            long stale = System.currentTimeMillis() - tmpConn.getMvCallTimeOut();
+            Iterator it = this.connections.iterator();
 
 
-            if ((tmpConn.inUse()) && (stale > tmpConn.getLastUse())) {
+            while (it.hasNext()) {
+                
+                MVConnection tmpConn = (MVConnection) it.next();
+                long stale = System.currentTimeMillis() - tmpConn.getMvCallTimeOut();
 
-                logger.error(Thread.currentThread().getName() + " stale connection found. killing connection");
-                tmpConn.killConnection();
-                it.remove();
+
+                if ((tmpConn.inUse()) && (stale > tmpConn.getLastUse())) {
+
+                    logger.error(Thread.currentThread().getName() + " stale connection found. killing connection");
+                    tmpConn.killConnection();
+                    it.remove();
+                    
+                }
+
             }
 
-        }
+            it = this.connections.iterator();
 
-        it = this.connections.iterator();
+            while (it.hasNext()) {
 
-        while (it.hasNext()) {
+                MVConnection tmpConn = (MVConnection) it.next();
 
-            MVConnection tmpConn = (MVConnection) it.next();
+                if ((tmpConn.pingTest() == false)) {
 
-            if ((tmpConn.pingTest() == false)) {
+                    logger.error(Thread.currentThread().getName() + " ping test failed. killing connection");
+                    tmpConn.killConnection();
+                    it.remove(); 
+                }
 
-                logger.error(Thread.currentThread().getName() + " ping test failed. killing connection");
-                tmpConn.killConnection();
-                it.remove();
             }
-
         }
 
 

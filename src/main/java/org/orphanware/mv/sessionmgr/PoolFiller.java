@@ -16,13 +16,21 @@ class PoolFiller extends Thread {
 
     }
 
+    @Override
     public void run() {
         while (true) {
+            
             try {
-                sleep(delay);
-            } catch (InterruptedException e) {
+                
+                try {
+                    sleep(delay);
+                } catch (InterruptedException e) {
+                }
+                pool.fillPool();
+        
+            }catch(Exception e) {
+                logger.info("PoolFiller Failed!");
             }
-            pool.fillPool();
         }
     }
 }

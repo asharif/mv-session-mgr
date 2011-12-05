@@ -24,10 +24,16 @@ import org.slf4j.LoggerFactory;
     public void run() {
         while (true) {
             try {
-                sleep(delay);
-            } catch (InterruptedException e) {
+                
+                try {
+                    sleep(delay);
+                } catch (InterruptedException e) {
+                }
+                pool.reapConnections();
+        
+            }catch(Exception e) {
+                logger.info("ConnectionReaper Failed!");
             }
-            pool.reapConnections();
         }
     }
 }
