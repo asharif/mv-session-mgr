@@ -29,6 +29,7 @@ public class MVSessionMgr implements MVSessionMgrMBean {
     private String url, user, password, account, accountPassword;
     private int poolsize = 1;
     private ConnectionReaper reaper;
+    private ConnectionReaperBoss reaperBoss;
     private PoolFiller filler;
     private MBeanServer mserver = ManagementFactory.getPlatformMBeanServer();
     private Logger logger = LoggerFactory.getLogger(MVSessionMgr.class);
@@ -89,7 +90,18 @@ public class MVSessionMgr implements MVSessionMgrMBean {
     public void setPoolsize(int poolsize) {
         this.poolsize = poolsize;
     }
+    
+    public ConnectionReaper getConnectionReaper() {
+        
+        return this.reaper;
+    }
 
+    public void setConnectionReaper(ConnectionReaper connReaper) {
+        
+        this.reaper = connReaper;
+    }   
+    
+    
     private MVSessionMgr() {
     }
 
@@ -118,6 +130,9 @@ public class MVSessionMgr implements MVSessionMgrMBean {
 
         reaper = new ConnectionReaper(this);
         reaper.start();
+        
+        reaperBoss = new ConnectionReaperBoss(this);
+        reaperBoss.start();
 
         filler = new PoolFiller(this);
         filler.start();

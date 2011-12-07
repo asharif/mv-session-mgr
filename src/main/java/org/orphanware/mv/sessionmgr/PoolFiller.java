@@ -10,7 +10,7 @@ class PoolFiller extends Thread {
     private Logger logger = LoggerFactory.getLogger(PoolFiller.class);
     
     PoolFiller(MVSessionMgr mgr) {
-        logger.debug("instantiating new filler thread");
+        logger.debug("instantiating new PoolFiller thread");
         setName("PoolFiller");
         this.pool = mgr;
 
@@ -33,4 +33,11 @@ class PoolFiller extends Thread {
             }
         }
     }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        logger.info(getName() + " had died unexpectedly!");
+    }
+    
 }

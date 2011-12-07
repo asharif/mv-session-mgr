@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.orphanware.utils.StringHelper;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author arash
  */
 public class MVConnection implements Connection {
-
+    private String id;
     private MVSessionMgr pool;
     private com.tigr.mvapi.MVConnection conn;
     private boolean inuse;
@@ -48,7 +49,7 @@ public class MVConnection implements Connection {
 
     public MVConnection(MVSessionMgr pool) throws SQLException {
 
-
+        this.id = UUID.randomUUID().toString();
         this.pool = pool;
         this.inuse = false;
         this.timestamp = 0;
@@ -108,10 +109,11 @@ public class MVConnection implements Connection {
             if (conn.isClosed() == true) {
                 return;
             }
+            
 
         } catch (MVException ex) {
 
-            logger.error(Thread.currentThread().getName() + " Failed when checking mvconnection status: " + StringHelper.getStackTraceAsString(ex));
+            logger.error(Thread.currentThread().getName() + " Failed checking connection status: " + this.id + " " + StringHelper.getStackTraceAsString(ex));
 
         }
         
@@ -178,6 +180,7 @@ public class MVConnection implements Connection {
             try {
 
                 this.inuse = true;
+                logger.debug("Pinging connection...");                
                 String result = conn.ping();
                 logger.debug("Ping test result: " + result);
                 this.inuse = false;

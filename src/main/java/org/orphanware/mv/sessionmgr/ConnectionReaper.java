@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
     private MVSessionMgr pool;
     private final long delay = 15000;
     private Logger logger = LoggerFactory.getLogger(ConnectionReaper.class);
-    
+       
     ConnectionReaper(MVSessionMgr mgr) {
-        logger.debug("instantiating new reaper thread");
+        logger.debug("instantiating new ConnectionReaper thread");
         setName("ConnectionReaper");
         this.pool = mgr;
         
@@ -36,4 +36,13 @@ import org.slf4j.LoggerFactory;
             }
         }
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        logger.info(getName() + " had died unexpectedly!");
+    
+    }
+    
+    
 }
