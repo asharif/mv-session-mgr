@@ -48,3 +48,125 @@ http://maven.apache.org/plugins/maven-assembly-plugin/
 
 3.  To build: mvn package
 
+
+HOW TO USE:
+
+1.  Add from step2 to class path
+2.  Call the session manager like described in sample class below:
+
+
+package com.foo;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import org.orphanware.mv.sessionmgr.MVConnection;
+import org.orphanware.mv.sessionmgr.MVSessionMgr;
+
+
+/**
+*
+* @author arash
+*/
+public class MVJDBCProxy {
+
+    
+    private MVConnection conn;
+    private MVSessionMgr mvSessionMgr;
+    
+    public MVJDBCProxy() throws InstanceAlreadyExistsException, MBeanRegistrationException,
+            NotCompliantMBeanException, MalformedObjectNameException, SQLException{
+            
+
+
+        mvSessionMgr = MVSessionMgr.getInstance();
+        mvSessionMgr.setUser("${mv.login}")); //default is MVSP
+        mvSessionMgr.setPassword("${mv.loginpass}"); //default is *blank*
+        mvSessionMgr.setAccount("${mv.account}"); //whatever account u want to login to
+        mvSessionMgr.setAccountPassword("${mv.accountpass}"); //the account password
+        mvSessionMgr.setUrl("${mv.addr}")); //jdbc:mv:mvbase:*.*.*.*:9010
+        mvSessionMgr.setPoolsize(5); //any num as long as u have licenses 
+        conn = (MVConnection) mvSessionMgr.getConnection();
+
+    }
+
+    
+    public ResultSet callMVSub(String subName, String params) throws SQLException,
+            Exception {
+        
+        ResultSet rs = null;
+        try {
+            
+            rs = conn.callMVSub(subName, params);
+        
+        } catch( Exception e) {
+            
+        } finally {
+        
+            conn.close();
+        }
+        
+        return rs;
+    }
+    
+    public ResultSet callMVSubLongWait(String subName, String params, int longWaitTime) throws SQLException,
+            Exception {
+        
+        ResultSet rs = null;
+        try {
+        
+            rs = conn.callMVSub(subName, params, longWaitTime);
+        
+        } catch( Exception e) {
+            
+        } finally {
+        
+            conn.close();
+        }
+        
+        return rs;
+    }
+}
+
+
+-------------------------------------------
+
+
+3.  access data like so:
+
+
+MVJDBCProxy mvproxy = new MVJDBCProxy();
+
+MVResultSet rs = (MVResultSet) mvproxy.callMVSub("HELLO.WORLD", "param1|param2"); //HELLO.WORLD is just example.  it would have to exist in account and be cataloged
+
+
+
+if (rs.getNumRows() == 0) {
+renderText("");
+return;
+}
+
+String[][] rows = new String[rs.getNumRows()][rs.getNumAttributes()];
+
+
+int i = 0;
+
+do {
+logger.debug("row " + i + " has " + rs.getNumAttributes() + " columns: " + rs.getRow(i));
+String[] attrbs = new String[rs.getNumAttributes()];
+for (int j = 0; j < rows[i].length; j++) {
+
+
+    attrbs[j] = rs.getAttrString(j);
+
+}
+
+rows[i] = attrbs;
+i++;
+
+} while (rs.next());
+
+
