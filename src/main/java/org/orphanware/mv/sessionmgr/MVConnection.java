@@ -506,28 +506,5 @@ public class MVConnection implements Connection {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public void abort(Executor exctr) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getNetworkTimeout() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getSchema() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setNetworkTimeout(Executor exctr, int i) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setSchema(String string) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+   
 }

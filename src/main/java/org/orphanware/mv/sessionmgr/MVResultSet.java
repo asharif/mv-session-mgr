@@ -1128,15 +1128,7 @@ public class MVResultSet implements ResultSet {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public <T> T getObject(int i, Class<T> type) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
-    @Override
-    public <T> T getObject(String string, Class<T> type) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
     
     
 }
