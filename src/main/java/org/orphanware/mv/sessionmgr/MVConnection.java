@@ -2,28 +2,12 @@ package org.orphanware.mv.sessionmgr;
 
 import com.tigr.mvapi.exceptions.MVException;
 import java.net.SocketException;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.NClob;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.sql.Struct;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import org.orphanware.utils.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author arash
  */
-public class MVConnection implements Connection {
+public class MVConnection{
     private String id;
     private MVSessionMgr pool;
     private com.tigr.mvapi.MVConnection conn;
@@ -197,7 +181,7 @@ public class MVConnection implements Connection {
         return true;
     }
 
-    @Override
+   
     public void close() throws SQLException {
 
 
@@ -210,7 +194,7 @@ public class MVConnection implements Connection {
      * @return ResultSet of concrete MVResultSet is returned.  Not all of MVResultSet
      * is implemented yet
      */
-    public ResultSet callMVSub(String subName, String params) throws Exception, SQLException {
+    public MVResultSet callMVSub(String subName, String params) throws Exception, SQLException {
 
         logger.debug(Thread.currentThread().getName() + " made call to callMVSub");
 
@@ -238,7 +222,8 @@ public class MVConnection implements Connection {
 
                 String message = Thread.currentThread().getName() + " mv sub call had a handled exception: " + args.get(3);
                 logger.debug(message);
-                throw new Exception(message);
+                MVResultSet results = new MVResultSet(args.get(3));
+                return results;
 
             }
 
@@ -258,7 +243,7 @@ public class MVConnection implements Connection {
 
     }
 
-    public ResultSet callMVSub(String subName, String params, int mvCallTimeOut) throws Exception, SQLException {
+    public MVResultSet callMVSub(String subName, String params, int mvCallTimeOut) throws Exception, SQLException {
 
         this.mvCallSubTimeOut = mvCallTimeOut;
 
@@ -266,245 +251,6 @@ public class MVConnection implements Connection {
 
     }
 
-    @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return conn.prepareStatement(sql);
-    }
-
-    @Override
-    public CallableStatement prepareCall(String sql) throws SQLException {
-        return conn.prepareCall(sql);
-    }
-
-    @Override
-    public Statement createStatement() throws SQLException {
-        return conn.createStatement();
-    }
-
-    @Override
-    public String nativeSQL(String sql) throws SQLException {
-        return conn.nativeSQL(sql);
-    }
-
-    @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        conn.setAutoCommit(autoCommit);
-    }
-
-    @Override
-    public boolean getAutoCommit() throws SQLException {
-        return conn.getAutoCommit();
-    }
-
-    @Override
-    public void commit() throws SQLException {
-        conn.commit();
-    }
-
-    @Override
-    public void rollback() throws SQLException {
-        conn.rollback();
-    }
-
-    @Override
-    public boolean isClosed() throws SQLException {
-        return conn.isClosed();
-    }
-
-    @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
-        return conn.getMetaData();
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        conn.setReadOnly(readOnly);
-    }
-
-    @Override
-    public boolean isReadOnly() throws SQLException {
-        return conn.isReadOnly();
-    }
-
-    @Override
-    public void setCatalog(String catalog) throws SQLException {
-        conn.setCatalog(catalog);
-    }
-
-    @Override
-    public String getCatalog() throws SQLException {
-        return conn.getCatalog();
-    }
-
-    @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        conn.setTransactionIsolation(level);
-    }
-
-    @Override
-    public int getTransactionIsolation() throws SQLException {
-        return conn.getTransactionIsolation();
-    }
-
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        return conn.getWarnings();
-    }
-
-    @Override
-    public void clearWarnings() throws SQLException {
-        conn.clearWarnings();
-    }
-
-    @Override
-    public Array createArrayOf(String string, Object[] os) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isWrapperFor(Class type) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Object unwrap(Class type) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Blob createBlob() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Clob createClob() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public NClob createNClob() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public SQLXML createSQLXML() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Statement createStatement(int i, int i1) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Statement createStatement(int i, int i1, int i2) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getClientInfo(String string) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Properties getClientInfo() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Map getTypeMap() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isValid(int i) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public CallableStatement prepareCall(String string, int i, int i1) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public CallableStatement prepareCall(String string, int i, int i1, int i2) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String string, int i, int i1) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String string, int i, int i1, int i2) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String string, int i) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String string, int[] ints) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String string, String[] strings) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void releaseSavepoint(Savepoint svpnt) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void rollback(Savepoint svpnt) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setClientInfo(String string, String string1) throws SQLClientInfoException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setClientInfo(Properties prprts) throws SQLClientInfoException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setHoldability(int i) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Savepoint setSavepoint() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Savepoint setSavepoint(String string) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setTypeMap(Map map) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Struct createStruct(String string, Object[] os) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
    
 }

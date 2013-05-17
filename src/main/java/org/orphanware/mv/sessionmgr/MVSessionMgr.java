@@ -232,7 +232,7 @@ public class MVSessionMgr implements MVSessionMgrMBean {
 
     }
 
-    public Connection getConnection() throws SQLException {
+    public MVConnection getConnection() throws SQLException {
         logger.debug(Thread.currentThread().getName() + " is requesting a connection b4 sync");
         synchronized (this.connections) {
             logger.debug(Thread.currentThread().getName() + " is requesting a connection after sync");
